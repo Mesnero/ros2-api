@@ -3,6 +3,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <cerrno>    
 #include <cstring>   
+#include <vector>
 
 namespace protocols
 {
@@ -80,11 +81,11 @@ namespace protocols
     }
 
     void UnixDomainSocket::handleClient() {
-        std::uint8_t buffer[max_message_size_];
+        std::vector<std::uint8_t> buffer(max_message_size_);
         ssize_t bytes_read = 0;
         while (client_connected_)
         {
-            memset(buffer, 0, sizeof(buffer));
+            memset(buffer.data(), 0, buffer.size());
             bytes_read = recv(client_fd_, buffer, sizeof(buffer), 0);
             if (bytes_read == -1)
             {
@@ -97,7 +98,7 @@ namespace protocols
                 client_connected_ = false;
                 break;
             }
-            callback_(buffer, bytes_read);
+            callback_(buffer.data(), bytes_read);
         }
     }
 
