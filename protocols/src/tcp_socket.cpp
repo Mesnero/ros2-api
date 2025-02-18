@@ -48,6 +48,12 @@ namespace protocols
             return;
         }
 
+        int opt = 1;
+        if (setsockopt(socket_fd_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+        {
+            RCLCPP_ERROR(rclcpp::get_logger("TCPSocket"), "setsockopt(SO_REUSEADDR) failed: %s", std::strerror(errno));
+        }
+
         memset(&server_addr_, 0, sizeof(server_addr_));
         server_addr_.sin_family = AF_INET;
         server_addr_.sin_port = htons(port_);

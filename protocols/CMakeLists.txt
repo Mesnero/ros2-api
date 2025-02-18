@@ -13,7 +13,7 @@ find_package(pluginlib REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 
-add_library(protocols src/unix_domain_socket.cpp)
+add_library(protocols src/unix_domain_socket.cpp src/tcp_socket.cpp)
 
 target_include_directories(protocols PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
