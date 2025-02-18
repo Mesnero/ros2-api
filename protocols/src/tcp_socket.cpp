@@ -102,7 +102,7 @@ namespace protocols
         while (client_connected_ && running_)
         {
             memset(buffer.data(), 0, buffer.size());
-            bytes_read = recv(client_fd_, buffer, sizeof(buffer), 0);
+            bytes_read = recv(client_fd_, buffer.data(), buffer.size(), 0);
             if (bytes_read == -1)
             {
                 RCLCPP_ERROR(rclcpp::get_logger("TCPSocket"), "Error reading from client: %s", std::strerror(errno));
