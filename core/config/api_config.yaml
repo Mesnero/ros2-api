@@ -24,7 +24,6 @@ ros2_api:
       - publisher: "JointGroupVelocityController"
         name: "velocity"  
         #topic: "/..." # Defaults to <name>/commands  
-			
     transport:
       type: "protocols::UnixDomainSocket" # Name of the plugin as set in the pluginlib.xml
       params: # Your own params for the plugin specified. Not checked by parser. Passed to the plugin. Optional.
