@@ -75,6 +75,9 @@ namespace config {
     std::vector<std::string> ConfigParser::getJointNames() const 
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        if(joint_names_.empty()) {
+            throw std::runtime_error("No joint names set.") 
+        }
         return joint_names_;
     }
 
