@@ -22,7 +22,7 @@ public:
             case MessageType::JOINT_GROUP_POSITION_CONTROLLER:
             case MessageType::JOINT_GROUP_EFFORT_CONTROLLER:
             case MessageType::JOINT_GROUP_VELOCITY_CONTROLLER:
-                return std::make_unique<TypedPublisher<std_msgs::msg::Float64MultiArray>>(node, topic, 10);
+                return std::make_unique<TypedPublisher<std_msgs::msg::Float64MultiArray>>(node, topic, queue_size);
 
             case MessageType::JOINT_TRAJECTORY_CONTROLLER:
                 return std::make_unique<TypedPublisher<trajectory_msgs::msg::JointTrajectory>>(node, topic, queue_size);

@@ -125,34 +125,6 @@ private:
                             const std::string& key,
                             const std::string& default_value);
 
-    /**
-     * @brief Get the message type from a string
-     * 
-     * @param message_type String representation of the message type
-     * @return MessageType Enum representation of the message type
-     */
-    MessageType getMessageType(std::string message_type);
-
-    /**
-     * @brief Get the default publisher topic
-     * 
-     * @param type Message type
-     * @param name Name of the publisher
-     * @return std::string Default publisher topic
-     */
-    std::string getDefaultPublisherTopic(MessageType type, std::string name);
-
-    /**
-     * @brief Replace a substring in a string with another string
-     * 
-     * @param str String to perform the replacement on
-     * @param from Substring to replace
-     * @param to Substring to replace with
-     * @return true if the replacement was successful
-     * @return false if the substring to replace was not found
-     */
-    bool replace(std::string& str, const std::string& from, const std::string& to);
-
     // Data members
     mutable std::mutex mutex_;
     YAML::Node root_node_;

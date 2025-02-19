@@ -94,6 +94,7 @@ namespace config {
 
     bool ConfigParser::validate_config()
     {
+        MessageTypeMapper mtm;
         // Check if the root node has the necessary keys
         if (!root_node_["ros2_api"] || !root_node_["ros2_api"]["ros__parameters"])
         {
@@ -142,8 +143,11 @@ namespace config {
                 continue;
             }
             std::string msgTypeStr = iface["publisher"].as<std::string>();
-            MessageType type = getMessageType(msgTypeStr);
-            if (type == MessageType::UNKNOWN) continue;
+            MessageType type = mtm.getTypeFromString(msgTypeStr);
+            if (type == MessageType::UNKNOWN) {
+                RCLCPP_ERROR(logger_, "Unknown publisher type. Skipping.");
+                continue;
+            }
             cfg.msgType = type;
             if (!iface["name"]) {
                 RCLCPP_ERROR(logger_, "No name specified. Skipping.");
@@ -153,7 +157,7 @@ namespace config {
             cfg.name = name;
 
             if (!iface["topic"]) {
-                cfg.topic = getDefaultPublisherTopic(cfg.msgType, cfg.name);
+                cfg.topic = mtm.getDefaultTopic(cfg.msgType, cfg.name);
                 RCLCPP_INFO(logger_, "No topic specified. Using default '%s'.", cfg.topic.c_str());
             }
             else {
@@ -163,7 +167,7 @@ namespace config {
                     cfg.topic = topic.substr(1);
                 }
                 else {
-                    cfg.topic = getDefaultPublisherTopic(cfg.msgType, cfg.name);
+                    cfg.topic = mtm.getDefaultTopic(cfg.msgType, cfg.name);
                     RCLCPP_ERROR(logger_, "Invalid topic name: %s. Must start with /. Using default %s.", topic.c_str(), cfg.topic.c_str());
                 }
             }
@@ -194,23 +198,6 @@ namespace config {
         return true;
     }
 
-    MessageType ConfigParser::getMessageType(std::string message_type) {
-        if (message_type == "JointTrajectoryController") {
-            return MessageType::JOINT_TRAJECTORY_CONTROLLER;
-        }
-        if (message_type == "JointGroupEffortController") {
-            return MessageType::JOINT_GROUP_EFFORT_CONTROLLER;
-        }
-        if (message_type == "JointGroupPositionController") {
-            return MessageType::JOINT_GROUP_POSITION_CONTROLLER;
-        }
-        if (message_type == "JointGroupVelocityController") {
-            return MessageType::JOINT_GROUP_VELOCITY_CONTROLLER;
-        }
-        RCLCPP_ERROR(logger_, "Controller type '%s' is unknown. Skipping.", message_type.c_str());
-        return MessageType::UNKNOWN;
-    }
-
     std::string ConfigParser::getTopicValue(const YAML::Node &params, const std::string &key, const std::string &default_value)
     {
         if (!params[key])
@@ -225,21 +212,6 @@ namespace config {
         }
         RCLCPP_ERROR(logger_, "Invalid topic name: %s. Using default %s.", topic.c_str(), default_value.c_str());
         return default_value;
-    }
-
-    std::string ConfigParser::getDefaultPublisherTopic(MessageType type, std::string name) {
-        TopicMap tm;
-        std::string defaultTopic = tm.DEFAULT_TOPIC_MAP[type];
-        replace(defaultTopic, "<name>", name);
-        return defaultTopic;
-    }
-
-    bool ConfigParser::replace(std::string& str, const std::string& from, const std::string& to) {
-        size_t start_pos = str.find(from);
-        if(start_pos == std::string::npos)
-            return false;
-        str.replace(start_pos, from.length(), to);
-        return true;
     }
 } // namespace config
 } // namespace ros2_api
