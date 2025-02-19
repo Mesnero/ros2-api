@@ -14,7 +14,9 @@ Defines the base [pluginlib](https://github.com/ros/pluginlib/tree/humble) class
 Implements specific communication protocols such as Unix Domain Sockets and Transmission Control Protocol and exports them as plugins.
 6. [publisher](https://github.com/Mesnero/ros2-api/tree/main/publisher)
 Provides a wrapper and factories for ROS2 publishers, to make them polymorpic.
-7. [types](https://github.com/Mesnero/ros2-api/tree/main/types)
+7. [ros2_api_msgs](https://github.com/Mesnero/ros2-api/tree/main/ros2_api_msgs)
+Adds custom message types for ClientFeedback and CalculatedStates
+9. [types](https://github.com/Mesnero/ros2-api/tree/main/types)
 Defines various types and enums used across the project.
 ## Building the project
 To build the project, follow these steps:
@@ -199,7 +201,12 @@ The Feedback Code currently has the following mapping:
 	WRONG_AMOUNT_OF_JOINTS (120): Returned if the length of the arrays sent don't match the amount of joints.
 	COMMAND_VALIDATED (200): Returned if the command was validated and is passed on to the controller
 ## Adding a new message type
-Right now it is difficult to add new message types. I will work on it, to make it easier.
+Right now it is difficult to add new message types. I will work on it, to make it easier. Currently it is only possible to extend the publishers, not the subscribers.
+1. In types.hpp: extend the MessageType enum with your new message and assign it your type number
+2. In types.hpp: add your new enum to the mapping array, along with it's String representation and default topic.
+3. In publisher_factory.hpp: Add your new enum to the switch case in createPublisher and return a new publisher with the msg it should have
+4. In json_serializer_msgs.hpp: If your msg isn't yet present: Add a wrapper struct around your message. (Similar to the others) And define the to_json and from_json methods.
+5. In json_serializer_msgs.cpp: Implement the to_json and from_json methods.
 
 ## Protocols
 ### protocols::TCPSocket
