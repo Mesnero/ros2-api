@@ -47,9 +47,13 @@ namespace ros2_api
         {
             std::vector<std::uint8_t> vec(data, data + size);
             json json_structure = json::from_msgpack(vec);
-            int type = json_structure["type"];
-            std::string name = json_structure["publisher_name"];
-            const void *msg = get_message_content(type, json_structure["payload"]);
+            int type;
+            json_structure.at("type").get_to(type);
+            std::string name;
+            json_structure.at("publisher_name").get_to(name);
+            json payload;
+            json_structure.at("payload").get_to(payload);
+            const void *msg = get_message_content(type, payload);
             return std::make_pair(name, msg);
         }
 

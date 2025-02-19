@@ -36,7 +36,6 @@ target_include_directories(converter PUBLIC
   ${nlohmann_json_SOURCE_DIR}/single_include
 )
 
-
 target_include_directories(converter PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -68,16 +67,20 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
+  # The following lines skip some lint checks. Uncomment them if needed.
+  # set(ament_cmake_copyright_FOUND TRUE)
+  # set(ament_cmake_cpplint_FOUND TRUE)
+  find_package(ament_cmake_gtest REQUIRED)
+  
+  ament_add_gtest(test_converter test/test_json_serializer.cpp)
+  if(TARGET test_converter)
+    target_include_directories(test_converter PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    )
+    target_link_libraries(test_converter converter)
+  endif()
 endif()
 
 # export headers and binaries for ament
@@ -87,6 +90,5 @@ ament_export_include_directories(
 ament_export_libraries(
   converter
 )
-
 
 ament_package()

@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(ros2_api_msgs REQUIRED)
+find_package(types_api REQUIRED)
 
 # Create an INTERFACE library for a header-only package.
 add_library(publisher INTERFACE)
@@ -27,6 +28,7 @@ ament_target_dependencies(publisher INTERFACE
   trajectory_msgs
   std_msgs
   ros2_api_msgs
+  types_api
 )
 
 # Install the header files.
@@ -37,5 +39,17 @@ install(
 
 # Export the include directories.
 ament_export_include_directories(include)
+
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_publisher test/test_publisher.cpp)
+  if(TARGET test_publisher)
+    target_include_directories(test_publisher PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    )
+    target_link_libraries(test_publisher publisher)
+  endif()
+endif()
 
 ament_package()

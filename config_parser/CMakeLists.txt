@@ -8,7 +8,7 @@ endif()
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(yaml-cpp REQUIRED) 
+find_package(yaml-cpp REQUIRED)
 find_package(types_api REQUIRED)
 
 # Specify include directories
@@ -50,10 +50,23 @@ install(
   DESTINATION include/ros2_api
 )
 
-
 # Export package information
 ament_export_include_directories(include)
 ament_export_libraries(config_parser)
-ament_export_dependencies(rclcpp yaml-cpp) 
+ament_export_dependencies(rclcpp yaml-cpp)
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_config_parser test/test_config_parser.cpp)
+  
+  if(TARGET test_config_parser)
+    target_include_directories(test_config_parser PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    )
+    # Link against your library
+    target_link_libraries(test_config_parser config_parser)
+    # Also link any additional dependencies if necessary
+  endif()
+endif()
 
 ament_package()

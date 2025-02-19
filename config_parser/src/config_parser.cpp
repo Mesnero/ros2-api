@@ -26,6 +26,7 @@ namespace ros2_api
         bool ConfigParser::load(const std::string &config_path)
         {
             std::lock_guard<std::mutex> lock(mutex_);
+            reset(); 
             try
             {
                 root_node_ = YAML::LoadFile(config_path);
@@ -43,13 +44,14 @@ namespace ros2_api
 
         void ConfigParser::reset()
         {
-            std::lock_guard<std::mutex> lock(mutex_);
             config_path_ = "";
             root_node_ = YAML::Node();
             publisher_config_.clear();
             transport_plugin_name_ = "";
             transport_params_ = YAML::Node();
             state_topic_ = "";
+            base_frame_ = "";
+            joint_names_.clear();
         }
 
         std::string ConfigParser::get_transport_type() const

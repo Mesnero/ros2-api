@@ -1,2 +1,2 @@
-uint8 status_code
+uint16 status_code
 string message
