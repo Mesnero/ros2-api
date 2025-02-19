@@ -6,9 +6,16 @@
 #include <functional>
 #include <memory>
 
+/**
+ * @file types.hpp
+ * @brief This file contains the definitions for message types, message type mapping, and feedback codes used in the ros2_api namespace.
+ */
 namespace ros2_api
 {
-
+	/**
+	 * @enum MessageType
+	 * @brief Enum representing different types of messages.
+	 */
 	enum MessageType
 	{
 		UNKNOWN = 0,
@@ -21,9 +28,16 @@ namespace ros2_api
 		JOINT_GROUP_VELOCITY_CONTROLLER = 32,
 	};
 
+	/**
+	 * @class MessageTypeMapper
+	 * @brief Class for mapping message types to their corresponding default topics.
+	 */
 	class MessageTypeMapper
 	{
 	public:
+		/**
+		 * @brief Constructor that initializes the message type to topic mapping.
+		 */
 		MessageTypeMapper()
 		{
 			mapping_["JointTrajectoryController"] = {JOINT_TRAJECTORY_CONTROLLER, "<name>/joint_trajectory"};
@@ -35,6 +49,11 @@ namespace ros2_api
 			mapping_["JointStates"] = {JOINT_STATES, "joint_states"};
 		}
 
+		/**
+		 * @brief Get the MessageType from a string key.
+		 * @param key The string key representing the message type.
+		 * @return The corresponding MessageType.
+		 */
 		MessageType getTypeFromString(const std::string &key) const
 		{
 			auto it = mapping_.find(key);
@@ -45,6 +64,12 @@ namespace ros2_api
 			return UNKNOWN;
 		}
 
+		/**
+		 * @brief Get the default topic for a given message type key and name.
+		 * @param key The string key representing the message type.
+		 * @param name The name to replace in the topic string.
+		 * @return The default topic string.
+		 */
 		std::string getDefaultTopic(const std::string &key, const std::string &name) const
 		{
 			auto it = mapping_.find(key);
@@ -57,6 +82,12 @@ namespace ros2_api
 			return "";
 		}
 
+		/**
+		 * @brief Get the default topic for a given MessageType and name.
+		 * @param type The MessageType.
+		 * @param name The name to replace in the topic string.
+		 * @return The default topic string.
+		 */
 		std::string getDefaultTopic(MessageType type, const std::string &name) const
 		{
 			for (const auto &entry : mapping_)
@@ -72,6 +103,13 @@ namespace ros2_api
 		}
 
 	private:
+		/**
+		 * @brief Replace a substring in a string with another string.
+		 * @param str The original string.
+		 * @param from The substring to be replaced.
+		 * @param to The string to replace with.
+		 * @return True if the replacement was successful, false otherwise.
+		 */
 		static bool replace(std::string &str, const std::string &from, const std::string &to)
 		{
 			size_t start_pos = str.find(from);
@@ -81,16 +119,27 @@ namespace ros2_api
 			return true;
 		}
 
+		/**
+		 * @brief Mapping from string keys to pairs of MessageType and default topic strings.
+		 */
 		std::unordered_map<std::string, std::pair<MessageType, std::string>> mapping_;
 	};
 
+	/**
+	 * @struct MessageConfig
+	 * @brief Struct representing the configuration of a message.
+	 */
 	struct MessageConfig
 	{
-		MessageType msgType;
+		MessageType msg_type;
 		std::string name;
 		std::string topic;
 	};
 
+	/**
+	 * @enum FeedbackCode
+	 * @brief Enum representing different feedback codes.
+	 */
 	enum FeedbackCode
 	{
 		PUBLISHER_NOT_FOUND = 1,

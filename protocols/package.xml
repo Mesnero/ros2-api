@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>Implementations of protocol base.</description>
   <maintainer email="johannes.mesner@tum.de">Johannes Mesner</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

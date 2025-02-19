@@ -5,34 +5,40 @@
 
 namespace ros2_api
 {
-namespace core
-{
-    FeedbackSender::FeedbackSender(std::shared_ptr<protocol_base::CommunicationProtocol> communicationProtocol)
-    : Node("feedback_sender"),
-      communicationProtocol_(std::move(communicationProtocol))
-    {} 
-
-    void FeedbackSender::sendFeedback(const ros2_api_msgs::msg::ClientFeedback &feedback)
+    namespace core
     {
-        converter::JsonSerializer msgConverter;
-        std::vector<std::uint8_t> feedbackByteArray;
-        try {
-            feedbackByteArray = msgConverter.serialize(feedback);
-        } catch(const std::exception &e) {
-            RCLCPP_ERROR(this->get_logger(), "Error serializing message.");
-            return;
+        FeedbackSender::FeedbackSender(std::shared_ptr<protocol_base::CommunicationProtocol> communication_protocol)
+            : Node("feedback_sender"),
+              communication_protocol_(std::move(communication_protocol))
+        {
         }
-        communicationProtocol_->sendToClient(feedbackByteArray.data(), feedbackByteArray.size());
-    }
 
-    void FeedbackSender::setUpSubscription() {
-        subscriberFeedback_ = this->create_subscription<ros2_api_msgs::msg::ClientFeedback>(
+        void FeedbackSender::send_feedback(const ros2_api_msgs::msg::ClientFeedback &feedback)
+        {
+            converter::JsonSerializer msg_converter;
+            std::vector<std::uint8_t> feedback_byte_array;
+            try
+            {
+                feedback_byte_array = msg_converter.serialize(feedback);
+            }
+            catch (const std::exception &e)
+            {
+                RCLCPP_ERROR(this->get_logger(), "Error serializing message.");
+                return;
+            }
+            communication_protocol_->send_to_client(feedback_byte_array.data(), feedback_byte_array.size());
+        }
+
+        void FeedbackSender::set_up_subscription()
+        {
+            subscriber_feedback_ = this->create_subscription<ros2_api_msgs::msg::ClientFeedback>(
                 "feedback_channel",
                 10,
-                [this](const ros2_api_msgs::msg::ClientFeedback::SharedPtr msg) {
-                    sendFeedback(*msg);
-        });
-    }
+                [this](const ros2_api_msgs::msg::ClientFeedback::SharedPtr msg)
+                {
+                    send_feedback(*msg);
+                });
+        }
 
-} // namespace core
+    } // namespace core
 } // namespace ros2_api

@@ -29,7 +29,7 @@ include_directories(
 file(GLOB SERVER_SOURCES src/*.cpp)
 file(GLOB SERVER_HEADERS include/core/*.hpp)
 
-# Add library (this includes config_manager.cpp)
+# Add library 
 add_library(core SHARED ${SERVER_SOURCES})
 
 # Set header file directory
@@ -38,8 +38,8 @@ target_include_directories(core PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-# Link dependencies to the library (core)
-target_link_libraries(core yaml-cpp)  # Add yaml-cpp linking explicitly
+# Link dependencies to the library
+target_link_libraries(core yaml-cpp)  
 
 ament_target_dependencies(core 
   rclcpp 

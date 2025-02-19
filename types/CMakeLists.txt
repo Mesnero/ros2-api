@@ -12,7 +12,7 @@ add_library(types_api INTERFACE)
 
 target_include_directories(types_api INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>  # Or whatever install path you choose.
+  $<INSTALL_INTERFACE:include>  
 )
 
 install(TARGETS ${PROJECT_NAME}

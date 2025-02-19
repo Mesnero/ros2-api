@@ -6,7 +6,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # install base headers
-#! this package exists just for this
 install(DIRECTORY include/ros2_api/protocol_base
   DESTINATION include/ros2_api)
 

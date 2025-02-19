@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>interface definitions needed to send data.</description>
   <maintainer email="johannes.mesner@tum.de">Johannes Mesner</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>geometry_msgs</depend>

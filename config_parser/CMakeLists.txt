@@ -28,7 +28,7 @@ target_include_directories(config_parser PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(config_parser yaml-cpp)  # Add yaml-cpp linking explicitly
+target_link_libraries(config_parser yaml-cpp)
 
 ament_target_dependencies(config_parser 
   rclcpp 
