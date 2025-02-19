@@ -204,9 +204,10 @@ The Feedback Code currently has the following mapping:
 Right now it is difficult to add new message types. I will work on it, to make it easier. Currently it is only possible to extend the publishers, not the subscribers.
 1. In types.hpp: extend the MessageType enum with your new message and assign it your type number
 2. In types.hpp: add your new enum to the mapping array, along with it's String representation and default topic.
-3. In publisher_factory.hpp: Add your new enum to the switch case in createPublisher and return a new publisher with the msg it should have
+3. In publisher_factory.hpp: Add your new enum to the switch case in create_publisher and return a new publisher with the msg it should have
 4. In json_serializer_msgs.hpp: If your msg isn't yet present: Add a wrapper struct around your message. (Similar to the others) And define the to_json and from_json methods.
 5. In json_serializer_msgs.cpp: Implement the to_json and from_json methods.
+6. In json_serializer.cpp: Add your MessageType to the get_message_content method
 
 ## Protocols
 ### protocols::TCPSocket
