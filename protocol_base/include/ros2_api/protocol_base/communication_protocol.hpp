@@ -2,11 +2,6 @@
 #define COMMUNICATION_PROTOCOL_HPP
 
 #include <functional>
-#include <thread>
-#include <atomic>
-#include <chrono>
-#include <vector>
-#include <memory>
 #include <yaml-cpp/yaml.h>
 
 /**

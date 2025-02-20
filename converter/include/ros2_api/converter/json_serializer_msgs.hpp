@@ -1,18 +1,19 @@
 #ifndef JSON_CONVERTERS_HPP
 #define JSON_CONVERTERS_HPP
 
-#include <string>
-#include <vector>
+#include <rclcpp/time.hpp>
+#include <nlohmann/json.hpp>
+
+#include <sensor_msgs/msg/joint_state.hpp>
+#include <geometry_msgs/msg/point.hpp>
+#include <trajectory_msgs/msg/joint_trajectory.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <builtin_interfaces/msg/duration.hpp>
+
 #include <ros2_api_msgs/msg/calculated_states.hpp>
 #include <ros2_api_msgs/msg/client_feedback.hpp>
-#include <trajectory_msgs/msg/joint_trajectory.hpp>
-#include <geometry_msgs/msg/point.hpp>
-#include <builtin_interfaces/msg/duration.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
-#include <rclcpp/time.hpp>
+
 #include <ros2_api/config_parser/config_parser.hpp>
-#include <sensor_msgs/msg/joint_state.hpp>
-#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

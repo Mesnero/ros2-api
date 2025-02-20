@@ -3,8 +3,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <functional>
-#include <memory>
+
 
 /**
  * @file types.hpp

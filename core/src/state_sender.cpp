@@ -3,7 +3,6 @@
 #include <ros2_api_msgs/msg/calculated_states.hpp>
 #include <ros2_api/config_parser/config_parser.hpp>
 #include <ros2_api/converter/json_serializer.hpp>
-#include <string>
 
 namespace ros2_api
 {
@@ -21,7 +20,6 @@ namespace ros2_api
         {
             converter::JsonSerializer msg_converter;
             std::vector<std::uint8_t> state_byte_aray = msg_converter.serialize(state);
-            RCLCPP_INFO(this->get_logger(), "SENDING MESSAGE");
             communication_protocol_->send_to_client(state_byte_aray.data(), state_byte_aray.size());
         }
 

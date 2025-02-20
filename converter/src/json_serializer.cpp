@@ -1,6 +1,7 @@
+#include <nlohmann/json.hpp>
+
 #include <ros2_api/converter/json_serializer.hpp>
 #include <ros2_api/types/types.hpp>
-#include <nlohmann/json.hpp>
 
 namespace ros2_api
 {

@@ -1,6 +1,5 @@
 #ifndef MESSAGE_PUBLISHER_INTERFACE_HPP
 #define MESSAGE_PUBLISHER_INTERFACE_HPP
-#include <string>
 
 /**
  * @file message_publisher_interface.hpp

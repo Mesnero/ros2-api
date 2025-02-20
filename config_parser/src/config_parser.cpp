@@ -1,9 +1,10 @@
-#include <iostream>
 #include <mutex>
 #include <string>
 #include <vector>
-#include <rclcpp/rclcpp.hpp>
+
 #include <yaml-cpp/yaml.h>
+#include <rclcpp/rclcpp.hpp>
+
 #include <ros2_api/types/types.hpp>
 #include <ros2_api/config_parser/config_parser.hpp>
 
