@@ -57,8 +57,6 @@ namespace ros2_api
             void handle_message(const std::uint8_t *message, int length);
 
         private:
-            std::map<std::string, TrajectoryPublisher> trajectory_publisher_;
-            std::map<std::string, GroupPublisher> group_publisher_;
             std::unordered_map<std::string, std::unique_ptr<IMessagePublisher>> publisher_map_;
 
             rclcpp::Publisher<ros2_api_msgs::msg::ClientFeedback>::SharedPtr publisher_feedback_;
