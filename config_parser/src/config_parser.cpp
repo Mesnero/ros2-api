@@ -95,12 +95,6 @@ namespace ros2_api
             return base_frame_;
         }
 
-        bool ConfigParser::use_calculated_states() const
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            return use_calculated_states_;
-        }
-
         bool ConfigParser::validate_config()
         {
             MessageTypeMapper mtm;
@@ -115,16 +109,6 @@ namespace ros2_api
 
             // Get state topic value
             state_topic_ = get_topic_value(params, "states_topic", "joint_states");
-
-            // Check if one wants to use calculated states
-            if (params["use_calculated_states"])
-            {
-                use_calculated_states_ = params["use_calculated_states"].as<bool>();
-            }
-            else
-            {
-                use_calculated_states_ = false;
-            }
 
             // Load joint_names and base_frame
             if (params["joint_names"].IsSequence())

@@ -12,6 +12,7 @@ find_package(trajectory_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(ros2_api_msgs REQUIRED)
 find_package(types_api REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 # Create an INTERFACE library for a header-only package.
 add_library(publisher INTERFACE)
@@ -29,6 +30,7 @@ ament_target_dependencies(publisher INTERFACE
   std_msgs
   ros2_api_msgs
   types_api
+  sensor_msgs
 )
 
 # Install the header files.

@@ -81,14 +81,6 @@ namespace ros2_api
             std::vector<MessageConfig> get_publisher_config() const;
 
             /**
-             * @brief Check if calculated states are used
-             *
-             * @return true if calculated states are used
-             * @return false if calculated states are not used
-             */
-            bool use_calculated_states() const;
-
-            /**
              * @brief Reset the configuration to its default state
              */
             void reset();
@@ -139,7 +131,6 @@ namespace ros2_api
             std::string state_topic_;
             std::string transport_plugin_name_;
             YAML::Node transport_params_;
-            bool use_calculated_states_;
             std::vector<std::string> joint_names_;
             std::vector<MessageConfig> publisher_config_;
         };

@@ -5,12 +5,12 @@
 #include <nlohmann/json.hpp>
 
 #include <sensor_msgs/msg/joint_state.hpp>
+#include <sensor_msgs/msg/joy.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 
-#include <ros2_api_msgs/msg/calculated_states.hpp>
 #include <ros2_api_msgs/msg/client_feedback.hpp>
 
 #include <ros2_api/config_parser/config_parser.hpp>
@@ -70,28 +70,6 @@ namespace ros2_api
         void from_json(const json &j, JointGroupController &g);
 
         /**
-         * @brief Structure to hold CalculatedStates message.
-         */
-        struct CalculatedStates
-        {
-            ros2_api_msgs::msg::CalculatedStates states;
-        };
-
-        /**
-         * @brief Convert CalculatedStates to JSON.
-         * @param j JSON object to store the converted data.
-         * @param c CalculatedStates object to be converted.
-         */
-        void to_json(json &j, const CalculatedStates c);
-
-        /**
-         * @brief Convert JSON to CalculatedStates.
-         * @param j JSON object containing the data.
-         * @param c CalculatedStates object to store the converted data.
-         */
-        void from_json(const json &j, CalculatedStates &c);
-
-        /**
          * @brief Structure to hold JointStates message.
          */
         struct JointStates
@@ -134,6 +112,28 @@ namespace ros2_api
          * @param f Feedback object to store the converted data.
          */
         void from_json(const json &j, Feedback &f);
+
+        /**
+         * @brief Structure to hold a Joy message.
+         */
+        struct Joy
+        {
+            sensor_msgs::msg::Joy joy;
+        };
+
+        /**
+         * @brief Convert Feedback to JSON.
+         * @param j JSON object to store the converted data.
+         * @param joy Joy object to be converted.
+         */
+        void to_json(json &j, const Joy joy);
+
+        /**
+         * @brief Convert JSON to Feedback.
+         * @param j JSON object containing the data.
+         * @param joy Joy object to store the converted data.
+         */
+        void from_json(const json &j, Joy &joy);
 
     } // namespace converter
 } // namespace ros2_api

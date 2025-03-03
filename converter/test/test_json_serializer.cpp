@@ -16,7 +16,6 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <ros2_api_msgs/msg/calculated_states.hpp>
 #include <ros2_api_msgs/msg/client_feedback.hpp>
 
 using json = nlohmann::json;
@@ -130,69 +129,7 @@ TEST(JsonConversionTest, JointGroupControllerFromJson) {
   EXPECT_EQ(jgc.positions.layout.data_offset, 0);
 }
 
-// Test 5: CalculatedStates to_json
-TEST(JsonConversionTest, CalculatedStatesToJson) {
-  CalculatedStates cs;
-  cs.states.name = {"state1", "state2"};
-  cs.states.position_angle = {0.1, 0.2};
-  cs.states.acceleration = {9.8, 0.0};
-  cs.states.velocity = {1.0, 2.0};
-  cs.states.jerk = {0.0, 0.1};
-  geometry_msgs::msg::Point p1, p2;
-  p1.x = 1; p1.y = 2; p1.z = 3;
-  p2.x = 4; p2.y = 5; p2.z = 6;
-  cs.states.position_space = {p1, p2};
-
-  json j;
-  to_json(j, cs);
-  EXPECT_EQ(j["names"], json::array({"state1", "state2"}));
-  EXPECT_EQ(j["position_angle"], json::array({0.1, 0.2}));
-  EXPECT_EQ(j["acceleration"], json::array({9.8, 0.0}));
-  EXPECT_EQ(j["velocity"], json::array({1.0, 2.0}));
-  EXPECT_EQ(j["jerk"], json::array({0.0, 0.1}));
-  ASSERT_TRUE(j.contains("position_absolute"));
-  ASSERT_TRUE(j["position_absolute"].is_array());
-  ASSERT_EQ(j["position_absolute"].size(), 2);
-  auto jp1 = j["position_absolute"][0];
-  EXPECT_EQ(jp1["x"], 1);
-  EXPECT_EQ(jp1["y"], 2);
-  EXPECT_EQ(jp1["z"], 3);
-  auto jp2 = j["position_absolute"][1];
-  EXPECT_EQ(jp2["x"], 4);
-  EXPECT_EQ(jp2["y"], 5);
-  EXPECT_EQ(jp2["z"], 6);
-}
-
-// Test 6: CalculatedStates from_json
-TEST(JsonConversionTest, CalculatedStatesFromJson) {
-  json j = {
-    {"names", {"stateA", "stateB"}},
-    {"position_angle", {0.5, 0.6}},
-    {"velocity", {1.5, 1.6}},
-    {"acceleration", {9.0, 0.0}},
-    {"jerk", {0.1, 0.2}},
-    {"position_space", json::array({
-        {{"x", 7}, {"y", 8}, {"z", 9}},
-        {{"x", 10}, {"y", 11}, {"z", 12}}
-    })}
-  };
-  CalculatedStates cs;
-  from_json(j, cs);
-  EXPECT_EQ(cs.states.name, std::vector<std::string>({"stateA", "stateB"}));
-  EXPECT_EQ(cs.states.position_angle, std::vector<double>({0.5, 0.6}));
-  EXPECT_EQ(cs.states.velocity, std::vector<double>({1.5, 1.6}));
-  EXPECT_EQ(cs.states.acceleration, std::vector<double>({9.0, 0.0}));
-  EXPECT_EQ(cs.states.jerk, std::vector<double>({0.1, 0.2}));
-  ASSERT_EQ(cs.states.position_space.size(), 2);
-  EXPECT_EQ(cs.states.position_space[0].x, 7);
-  EXPECT_EQ(cs.states.position_space[0].y, 8);
-  EXPECT_EQ(cs.states.position_space[0].z, 9);
-  EXPECT_EQ(cs.states.position_space[1].x, 10);
-  EXPECT_EQ(cs.states.position_space[1].y, 11);
-  EXPECT_EQ(cs.states.position_space[1].z, 12);
-}
-
-// Test 7: Feedback to_json
+// Test 6: Feedback to_json
 TEST(JsonConversionTest, FeedbackToJson) {
   Feedback fb;
   fb.feedback.status_code = 100;
@@ -203,7 +140,7 @@ TEST(JsonConversionTest, FeedbackToJson) {
   EXPECT_EQ(j["message"], "Test feedback");
 }
 
-// Test 8: Feedback from_json
+// Test 7: Feedback from_json
 TEST(JsonConversionTest, FeedbackFromJson) {
   json j = {
     {"feedback_code", 200},
@@ -215,7 +152,7 @@ TEST(JsonConversionTest, FeedbackFromJson) {
   EXPECT_EQ(fb.feedback.message, "All good");
 }
 
-// Test 9: JointStates to_json
+// Test 8: JointStates to_json
 TEST(JsonConversionTest, JointStatesToJson) {
   JointStates js;
   js.states.name = {"jointA", "jointB"};
@@ -230,7 +167,7 @@ TEST(JsonConversionTest, JointStatesToJson) {
   EXPECT_EQ(j["effort"], json::array({5.0, 6.0}));
 }
 
-// Test 10: JointStates from_json
+// Test 9: JointStates from_json
 TEST(JsonConversionTest, JointStatesFromJson) {
   ASSERT_TRUE(setTestConfig());
   json j = {
@@ -249,7 +186,7 @@ TEST(JsonConversionTest, JointStatesFromJson) {
 
 // JsonSerializer tests
 
-// Test 11: JsonSerializer::serialize for ClientFeedback
+// Test 10: JsonSerializer::serialize for ClientFeedback
 TEST(JsonSerializerTest, SerializeClientFeedback) {
   ros2_api_msgs::msg::ClientFeedback msg;
   msg.status_code = 404;
@@ -262,35 +199,7 @@ TEST(JsonSerializerTest, SerializeClientFeedback) {
   EXPECT_EQ(j["payload"]["message"], "Not Found");
 }
 
-// Test 12: JsonSerializer::serialize for CalculatedStates
-TEST(JsonSerializerTest, SerializeCalculatedStates) {
-  ros2_api_msgs::msg::CalculatedStates msg;
-  msg.name = {"stateX", "stateY"};
-  msg.position_angle = {0.7, 0.8};
-  msg.acceleration = {9.1, 9.2};
-  msg.velocity = {1.1, 1.2};
-  msg.jerk = {0.3, 0.4};
-  geometry_msgs::msg::Point p;
-  p.x = 7; p.y = 8; p.z = 9;
-  msg.position_space = {p};
-
-  auto data = JsonSerializer::serialize(msg);
-  json j = json::from_msgpack(data);
-  EXPECT_EQ(j["type"], MessageType::CALCULATED_STATES);
-  EXPECT_EQ(j["name"], "calculated_states");
-  EXPECT_EQ(j["payload"]["names"], json::array({"stateX", "stateY"}));
-  EXPECT_EQ(j["payload"]["position_angle"], json::array({0.7, 0.8}));
-  EXPECT_EQ(j["payload"]["acceleration"], json::array({9.1, 9.2}));
-  EXPECT_EQ(j["payload"]["velocity"], json::array({1.1, 1.2}));
-  EXPECT_EQ(j["payload"]["jerk"], json::array({0.3, 0.4}));
-  ASSERT_TRUE(j["payload"].contains("position_absolute"));
-  ASSERT_EQ(j["payload"]["position_absolute"].size(), 1);
-  EXPECT_EQ(j["payload"]["position_absolute"][0]["x"], 7);
-  EXPECT_EQ(j["payload"]["position_absolute"][0]["y"], 8);
-  EXPECT_EQ(j["payload"]["position_absolute"][0]["z"], 9);
-}
-
-// Test 13: JsonSerializer::serialize for JointState
+// Test 11: JsonSerializer::serialize for JointState
 TEST(JsonSerializerTest, SerializeJointState) {
   sensor_msgs::msg::JointState msg;
   msg.name = {"joint1", "joint2"};
@@ -307,7 +216,7 @@ TEST(JsonSerializerTest, SerializeJointState) {
   EXPECT_EQ(j["payload"]["effort"], json::array({5.0, 6.0}));
 }
 
-// Test 14: JsonSerializer::deserialize for a known type (ClientFeedback)
+// Test 12: JsonSerializer::deserialize for a known type (ClientFeedback)
 TEST(JsonSerializerTest, DeserializeClientFeedback) {
   json j = {
     {"type", MessageType::CLIENT_FEEDBACK},

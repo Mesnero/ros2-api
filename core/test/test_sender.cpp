@@ -14,7 +14,6 @@
 #include "ros2_api/protocol_base/communication_protocol.hpp"
 #include "ros2_api/config_parser/config_parser.hpp"
 #include "ros2_api_msgs/msg/client_feedback.hpp"
-#include "ros2_api_msgs/msg/calculated_states.hpp"
 #include "ros2_api/converter/json_serializer.hpp"
 
 #include <sensor_msgs/msg/joint_state.hpp>
@@ -93,67 +92,12 @@ TEST(FeedbackAndStateSenderTest, FeedbackSenderSubscriptionCallback) {
   EXPECT_EQ(payload["message"].get<std::string>(), "Feedback test message");
 }
 
-TEST(FeedbackAndStateSenderTest, StateSenderCalculatedStateSubscription) {
-  std::string config_content = R"(
-ros2_api:
-  ros__parameters:
-    states_topic: "/calc_state_topic"
-    use_calculated_states: true
-    publishers: 
-      - publisher: "JointGroupPositionController"
-        name: "test"
-    transport:
-      type: "dummy_transport"
-      params: {}
-)";
-  auto config_file = create_temp_config(config_content);
-
-  auto &config = ros2_api::config::ConfigParser::instance();
-  config.reset();
-  EXPECT_TRUE(config.load(config_file));
-
-  rclcpp::executors::SingleThreadedExecutor executor;
-
-  auto dummy_protocol = std::make_shared<DummyProtocol>();
-
-  auto state_sender = std::make_shared<ros2_api::core::StateSender>(dummy_protocol);
-  state_sender->set_up_subscription();
-  executor.add_node(state_sender);
-
-  auto pub_node = rclcpp::Node::make_shared("calc_state_publisher_node");
-  auto publisher = pub_node->create_publisher<ros2_api_msgs::msg::CalculatedStates>("/calc_state_topic", 10);
-  executor.add_node(pub_node);
-
-  ros2_api_msgs::msg::CalculatedStates calc;
-  calc.name = {"calc_state_test"};
-  calc.acceleration = {1.0};
-  calc.jerk = {1.0};
-  calc.position_angle = {1.0};
-  calc.position_space = std::vector<geometry_msgs::msg::Point>{};
-
-  publisher->publish(calc);
-
-  auto start = std::chrono::steady_clock::now();
-  while (dummy_protocol->last_sent_data.empty() && (std::chrono::steady_clock::now() - start < 2s)) {
-      executor.spin_some(10ms);
-  }
-  EXPECT_FALSE(dummy_protocol->last_sent_data.empty());
-
-  json j = json::from_msgpack(dummy_protocol->last_sent_data);
-  EXPECT_EQ(j["type"], MessageType::CALCULATED_STATES);
-  EXPECT_EQ(j["name"].get<std::string>(), "calculated_states");
-
-  json payload = j["payload"];
-  ASSERT_TRUE(payload.contains("names"));
-  EXPECT_EQ(payload["names"], json::array({"calc_state_test"}));
-}
 
 TEST(FeedbackAndStateSenderTest, StateSenderJointStateSubscription) {
   std::string config_content = R"(
 ros2_api:
   ros__parameters:
     states_topic: "/joint_state_topic"
-    use_calculated_states: false
     publishers: 
       - publisher: "JointGroupPositionController"
         name: "test"

@@ -7,8 +7,8 @@
 #include <ros2_api/types/types.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
-#include <ros2_api_msgs/msg/calculated_states.hpp>
 #include <ros2_api_msgs/msg/client_feedback.hpp>
+#include <sensor_msgs/msg/joy.hpp>
 
 namespace ros2_api
 {
@@ -46,12 +46,10 @@ namespace ros2_api
                 case MessageType::JOINT_TRAJECTORY_CONTROLLER:
                     return std::make_unique<TypedPublisher<trajectory_msgs::msg::JointTrajectory>>(node, topic, queue_size);
 
-                case MessageType::CALCULATED_STATES:
-                    return std::make_unique<TypedPublisher<ros2_api_msgs::msg::CalculatedStates>>(node, topic, queue_size);
-
                 case MessageType::CLIENT_FEEDBACK:
                     return std::make_unique<TypedPublisher<ros2_api_msgs::msg::ClientFeedback>>(node, topic, queue_size);
-
+                case MessageType::JOY_MESSAGE:
+                    return std::make_unique<TypedPublisher<sensor_msgs::msg::Joy>>(node, topic, queue_size);
                 default:
                     throw std::runtime_error("Unknown MessageType");
                 }

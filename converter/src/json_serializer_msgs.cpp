@@ -6,7 +6,6 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
-#include <ros2_api_msgs/msg/calculated_states.hpp>
 #include <ros2_api_msgs/msg/client_feedback.hpp>
 
 #include <ros2_api/converter/json_serializer_msgs.hpp>
@@ -77,43 +76,6 @@ namespace ros2_api
             g.positions.layout.data_offset = 0;
         }
 
-        void to_json(json &j, const CalculatedStates c)
-        {
-            j["names"] = c.states.name;
-            j["position_angle"] = c.states.position_angle;
-            j["acceleration"] = c.states.acceleration;
-            j["velocity"] = c.states.velocity;
-            j["jerk"] = c.states.jerk;
-            j["position_absolute"] = json::array();
-            std::vector<geometry_msgs::msg::Point> points = c.states.position_space;
-            for (auto point : points)
-            {
-                j["position_absolute"].push_back(json{
-                    {"x", point.x},
-                    {"y", point.y},
-                    {"z", point.z}});
-            }
-        }
-
-        void from_json(const json &j, CalculatedStates &c)
-        {
-            j.at("names").get_to(c.states.name);
-            j.at("position_angle").get_to(c.states.position_angle);
-            j.at("velocity").get_to(c.states.velocity);
-            j.at("acceleration").get_to(c.states.acceleration);
-            j.at("jerk").get_to(c.states.jerk);
-            std::vector<json> points;
-            j.at("position_space").get_to(points);
-            for (json point : points)
-            {
-                geometry_msgs::msg::Point p;
-                point.at("x").get_to(p.x);
-                point.at("y").get_to(p.y);
-                point.at("z").get_to(p.z);
-                c.states.position_space.push_back(p);
-            }
-        }
-
         void to_json(json &j, const Feedback f)
         {
             j["feedback_code"] = f.feedback.status_code;
@@ -138,12 +100,23 @@ namespace ros2_api
         {
             auto joint_names = config::ConfigParser::instance().get_joint_names();
             auto frame_id = config::ConfigParser::instance().get_base_frame();
-            js.states.header.stamp = rclcpp::Time(0, 0, RCL_ROS_TIME);
             js.states.header.frame_id = frame_id;
             js.states.name = joint_names;
             j.at("position").get_to(js.states.position);
             j.at("effort").get_to(js.states.effort);
             j.at("velocity").get_to(js.states.velocity);
         }
+
+
+        void to_json(json &j, const Joy joy) {
+            j["axes"] = joy.joy.axes;
+            j["buttons"] = joy.joy.buttons;
+        } 
+
+        void from_json(const json &j, Joy &joy) {
+            j.at("axes").get_to(joy.joy.axes);
+            j.at("buttons").get_to(joy.joy.buttons);
+        }
+
     } // namespace converter
 } // namespace ros2_api

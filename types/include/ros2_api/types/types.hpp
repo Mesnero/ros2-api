@@ -20,11 +20,11 @@ namespace ros2_api
 		UNKNOWN = 0,
 		CLIENT_FEEDBACK = 1,
 		JOINT_STATES = 2,
-		CALCULATED_STATES = 10,
 		JOINT_TRAJECTORY_CONTROLLER = 20,
 		JOINT_GROUP_POSITION_CONTROLLER = 30,
 		JOINT_GROUP_EFFORT_CONTROLLER = 31,
 		JOINT_GROUP_VELOCITY_CONTROLLER = 32,
+		JOY_MESSAGE = 50
 	};
 
 	/**
@@ -43,9 +43,9 @@ namespace ros2_api
 			mapping_["JointGroupPositionController"] = {JOINT_GROUP_POSITION_CONTROLLER, "<name>/commands"};
 			mapping_["JointGroupEffortController"] = {JOINT_GROUP_EFFORT_CONTROLLER, "<name>/commands"};
 			mapping_["JointGroupVelocityController"] = {JOINT_GROUP_VELOCITY_CONTROLLER, "<name>/commands"};
-			mapping_["CalculatedStates"] = {CALCULATED_STATES, "calc_joint_states"};
 			mapping_["ClientFeedback"] = {CLIENT_FEEDBACK, "feedback_channel"};
 			mapping_["JointStates"] = {JOINT_STATES, "joint_states"};
+			mapping_["JoyMessage"] = {JOY_MESSAGE, "controller_input"};
 		}
 
 		/**
@@ -144,16 +144,14 @@ namespace ros2_api
 		PUBLISHER_NOT_FOUND = 1,
 		UNEXPECTED_MSG_STRUCTURE = 2,
 		ROBOT_DISCONNECTED_UNEXPECTEDLY = 3,
-		ROBOT_BREAKS = 101,
-		WORKSPACE_VIOLATION = 102,
-		SELF_COLLISION = 103,
-		COLLISION_WITH_COLLISION_OBJECT = 104,
-		POSITION_VIOLATION = 105,
-		JERK_VIOLATION = 106,
-		ACCELERATION_VIOLATION = 107,
-		VELOCITY_VIOLATION = 108,
-		WRONG_AMOUNT_OF_JOINTS = 120,
-		COMMAND_VALIDATED = 200,
+		INVALID_CMD = 100,
+		NO_WARNING = 101,
+		DECELERATE_FOR_APPROACHING_SINGULARITY = 102,
+		HALT_FOR_SINGULARITY = 103,
+		DECELERATE_FOR_COLLISION = 104,
+		HALT_FOR_COLLISION = 105,
+		JOINT_BOUND = 106,
+		DECELERATE_FOR_LEAVING_SINGULARITY = 107
 	};
 
 } // namespace ros2_api

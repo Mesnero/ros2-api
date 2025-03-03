@@ -15,7 +15,7 @@ Implements specific communication protocols such as Unix Domain Sockets and Tran
 6. [publisher](https://github.com/Mesnero/ros2-api/tree/main/publisher)
 Provides a wrapper and factories for ROS2 publishers, to make them polymorpic.
 7. [ros2_api_msgs](https://github.com/Mesnero/ros2-api/tree/main/ros2_api_msgs)
-Adds custom message types for ClientFeedback and CalculatedStates
+Adds custom message type for ClientFeedback
 9. [types](https://github.com/Mesnero/ros2-api/tree/main/types)
 Defines various types and enums used across the project.
 ## Building the project
@@ -38,11 +38,6 @@ The configuration file is structured under a single top-level key: `ros2_api`. U
 - Type: String
 - Description: Specifies the ROS topic from which the joint states are read.
 - Default / Example: `"joint_states"`
-- Required: false
-#### `use_calculated_states`:
-- Type: Boolean
-- Description: Indicates whether the API should use the sensor_msgs/JointState message or an the extended ros2_api_msgs/CalculatedStates. Latter is used by [this](https://github.com/Mesnero/rosbco) example repo to estimate more states, than provided.
-- Default / Example: `false`
 - Required: false
 #### `joint_names`:
 - Type: List of Strings
@@ -156,21 +151,6 @@ JSON Structure:
 				"positions": double[];
 				"velocity": double[];
 				"effort": double[];
-	}
-#### CalculatedStates
-Default topic: `calc_joint_states`
-JSON Structure:
-
-    {
-		"type": 10;
-		"publisher_name": string;
-		"payload": 
-				"names": string[];
-				"position_angle": double[];
-				"velocity": double[];
-				"acceleration": double[];
-				"jerk": double[];
-				"position_space": [{"x": int, "y": int, "z": int}];
 	}
 #### ClientFeedback
 Default topic: `feedback_channel`

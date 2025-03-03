@@ -12,7 +12,6 @@
 
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
-#include <ros2_api_msgs/msg/calculated_states.hpp>
 #include <ros2_api_msgs/msg/client_feedback.hpp>
 
 using namespace std::chrono_literals;
@@ -144,30 +143,6 @@ TEST_F(PublisherFactoryTest, JointTrajectoryController) {
   ASSERT_TRUE(received);
   auto received_msg = fut.get();
   EXPECT_EQ(received_msg.header.frame_id, msg.header.frame_id);
-}
-
-// Test for publisher type: CALCULATED_STATES.
-TEST_F(PublisherFactoryTest, CalculatedStates) {
-  std::string topic = "test_cs";
-  auto publisher = PublisherFactory::create_publisher(node_, MessageType::CALCULATED_STATES, topic, 10);
-
-  std::promise<ros2_api_msgs::msg::CalculatedStates> prom;
-  auto fut = prom.get_future();
-  auto subscription = node_->create_subscription<ros2_api_msgs::msg::CalculatedStates>(
-    topic, 10,
-    [&prom](const ros2_api_msgs::msg::CalculatedStates::SharedPtr msg) {
-      prom.set_value(*msg);
-    }
-  );
-
-  ros2_api_msgs::msg::CalculatedStates msg;
-  msg.name = {"state1", "state2"};
-  publisher->publish(&msg);
-
-  bool received = wait_for_future(fut, 1000ms);
-  ASSERT_TRUE(received);
-  auto received_msg = fut.get();
-  EXPECT_EQ(received_msg.name, msg.name);
 }
 
 // Test for publisher type: CLIENT_FEEDBACK.

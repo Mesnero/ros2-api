@@ -20,18 +20,6 @@ namespace ros2_api
             return json::to_msgpack(wrapped);
         }
 
-        std::vector<std::uint8_t> JsonSerializer::serialize(ros2_api_msgs::msg::CalculatedStates msg)
-        {
-            CalculatedStates calc;
-            calc.states = msg;
-            json j = calc;
-            json wrapped = json{
-                {"type", MessageType::CALCULATED_STATES},
-                {"name", "calculated_states"},
-                {"payload", j}};
-            return json::to_msgpack(wrapped);
-        }
-
         std::vector<std::uint8_t> JsonSerializer::serialize(sensor_msgs::msg::JointState msg)
         {
             JointStates js;
@@ -80,15 +68,15 @@ namespace ros2_api
                 JointGroupController *j = new JointGroupController(payload);
                 return (void *)j;
             }
-            if (type == MessageType::CALCULATED_STATES)
-            {
-                CalculatedStates *c = new CalculatedStates(payload);
-                return (void *)c;
-            }
             if (type == MessageType::CLIENT_FEEDBACK)
             {
                 Feedback *f = new Feedback(payload);
                 return (void *)f;
+            }
+            if (type == MessageType::JOY_MESSAGE) 
+            {
+                Joy *j = new Joy(payload);
+                return (void *)j;
             }
             throw std::runtime_error("MessageType unknown");
         }

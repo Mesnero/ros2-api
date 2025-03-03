@@ -62,7 +62,6 @@ TEST_F(ConfigParserTest, ValidConfig)
 ros2_api:
   ros__parameters:
     states_topic: "/joint_states"
-    use_calculated_states: true
     joint_names:
       - "panda_joint1"
       - "panda_joint2"
@@ -82,8 +81,6 @@ ros2_api:
 
     // Verify states topic (leading '/' stripped)
     EXPECT_EQ(ConfigParser::instance().get_state_topic(), "joint_states");
-    // Verify the flag is set correctly.
-    EXPECT_TRUE(ConfigParser::instance().use_calculated_states());
 
     // Verify joint names.
     std::vector<std::string> joint_names = ConfigParser::instance().get_joint_names();
