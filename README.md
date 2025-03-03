@@ -31,7 +31,7 @@ To run the project, you can use the example launch file provided:
 `ros2  launch  core  server_launch.py`
 
 ## Configuration
-The project uses a YAML configuration file to specify various parameters. The default configuration file is located at  [api_config.yaml](https://github.com/Mesnero/ros2-api/blob/main/core/config/api_config.yaml).
+The project uses a YAML configuration file to specify various parameters. One example configuration file is located at  [api_config.yaml](https://github.com/Mesnero/ros2-api/blob/main/core/config/api_config.yaml).
 ### File Structure
 The configuration file is structured under a single top-level key: `ros2_api`. Under this key, you define the parameters and settings used by the API. Here’s an annotated breakdown of each section: 
 #### `states_topic`:
@@ -64,6 +64,7 @@ The configuration file is structured under a single top-level key: `ros2_api`. U
 			- JointGroupEffortController
 			- JointGroupPositionController
 			- JointGroupVelocityController
+			- JoyMessage
 		- Required: True
 	- `name`
 		- Type: String
@@ -71,7 +72,7 @@ The configuration file is structured under a single top-level key: `ros2_api`. U
 		- Required: True
 	- `topic`:
 		- Type: String
-		- Description: The topic name to which the publisher sends its command. If omitted, it defaults to  a value specified by the Message.
+		- Description: The topic name to which the publisher sends its command. If omitted, it defaults to a value specified by the Message.
 		- Required: False
 #### `transport`:
 - Type: Object
@@ -87,10 +88,11 @@ The configuration file is structured under a single top-level key: `ros2_api`. U
 
 
 ## Currently supported messages
-Since this project is mainly used to directly communicate with [ROS2 Control](https://control.ros.org/humble/index.html) the messages right now span the most frequently used controllers when talking to Manipulators.
+Since this project is mainly used to directly communicate with [ROS2 Control](https://control.ros.org/humble/index.html) the messages right now span the most frequently used controllers when talking to Manipulators. To add teleoperation support, the [Joy Message](https://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Joy.html) is also available.
 
 #### [JointTrajectoryController](https://control.ros.org/humble/doc/ros2_controllers/joint_trajectory_controller/doc/userdoc.html)
 Default topic: `<name>/joint_trajectory`
+
 JSON Structure:
 
     {
@@ -111,6 +113,7 @@ JSON Structure:
 	}
 #### [JointGroupPositionController](https://control.ros.org/humble/doc/ros2_controllers/position_controllers/doc/userdoc.html)
 Default topic: `<name>/commands`
+
 JSON Structure:
 
     {
@@ -121,6 +124,7 @@ JSON Structure:
 	}
 #### [JointGroupEffortController](https://control.ros.org/humble/doc/ros2_controllers/effort_controllers/doc/userdoc.html)
 Default topic: `<name>/commands`
+
 JSON Structure:
 
     {
@@ -131,6 +135,7 @@ JSON Structure:
 	}
 #### [JointGroupVelocityController](https://control.ros.org/humble/doc/ros2_controllers/velocity_controllers/doc/userdoc.html)
 Default topic: `<name>/commands`
+
 JSON Structure:
 
     {
@@ -139,8 +144,20 @@ JSON Structure:
 		"payload": 
 			"joint_values": double[];
 	}
+#### [JoyMessage](https://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Joy.html)
+Default topic: `controller_input`
+JSON Structure:
+
+    {
+		"type": 50;
+		"publisher_name": string;
+		"payload": 
+			"buttons": int[];
+   			"axes": double[];
+	}
 #### JointStates
 Default topic: `joints_states`
+
 JSON Structure:
 
     {
@@ -154,6 +171,7 @@ JSON Structure:
 	}
 #### ClientFeedback
 Default topic: `feedback_channel`
+
 JSON Structure:
 
     {
@@ -170,16 +188,14 @@ The Feedback Code currently has the following mapping:
     PUBLISHER_NOT_FOUND (1): Returned when the publisher_name was not found.
 	UNEXPECTED_MSG_STRUCTURE (2):  Returned when the JSON Structure was formatted unexpectedly.
 	ROBOT_DISCONNECTED_UNEXPECTEDLY (3): Returned when the robot suddenly disconnected.
-	ROBOT_BREAKS (101): Returned when the robot breaks, due to wrong input.
-	WORKSPACE_VIOLATION (102): Returned if the command would result in a workspace violation.
-	SELF_COLLISION (103): Returned if the command would result in self collision.
-	COLLISION_WITH_COLLISION_OBJECT (104): Returned if the command would result in a collision with a collision object.
-	POSITION_VIOLATION (105): Returned if the command would result in a position violation.
-	JERK_VIOLATION (106): Returned if the command would result in a jerk violation.
-	ACCELERATION_VIOLATION (107): Returned if the command would result in an accerlaration violation.
-	VELOCITY_VIOLATION (108): Returned if the command would result in a velocity violation.
-	WRONG_AMOUNT_OF_JOINTS (120): Returned if the length of the arrays sent don't match the amount of joints.
-	COMMAND_VALIDATED (200): Returned if the command was validated and is passed on to the controller
+	INVALID_CMD (100): Returned if the validator can't use the command.
+	NO_WARNING (101): Returned if everything worked as expected.
+	DECELERATE_FOR_APPROACHING_SINGULARITY (102): Returned if the Validator needs to break, because of an approaching singularity.
+ 	HALT_FOR_SINGULARITY (103): Returned if the Validator needs to halt, because of a singularity.
+  	DECELERATE_FOR_COLLISION (104): Returned if the Validator needs to break, because of an upcomming collision.
+   	HALT_FOR_COLLISION (105): Returned if the Validator needs to halt, because of a collision.
+	JOINT_BOUND (106): Returned if the Validator is close to a Joint/Velocity limit and needs to break/halt.
+	DECELERATE_FOR_LEAVING_SINGULARITY: Sent when robot is currently leaving the singularity.
 ## Adding a new message type
 Right now it is difficult to add new message types. I will work on it, to make it easier. Currently it is only possible to extend the publishers, not the subscribers.
 1. In types.hpp: extend the MessageType enum with your new message and assign it your type number
