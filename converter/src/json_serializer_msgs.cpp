@@ -109,12 +109,19 @@ namespace ros2_api
 
 
         void to_json(json &j, const Joy joy) {
-            j["axes"] = joy.joy.axes;
+            std::vector<float> axesFloat = joy.joy.axes;
+            std::vector<double> axesDouble(axesFloat.begin(), axesFloat.end());
+            j["axes"] = axesDouble;
             j["buttons"] = joy.joy.buttons;
         } 
 
         void from_json(const json &j, Joy &joy) {
-            j.at("axes").get_to(joy.joy.axes);
+            std::vector<double> axesDouble;
+            j.at("axes").get_to(axesDouble);
+            joy.joy.axes.resize(axesDouble.size());
+            std::transform(axesDouble.begin(), axesDouble.end(), joy.joy.axes.begin(), [](double val) {
+                return static_cast<float>(val);
+            });
             j.at("buttons").get_to(joy.joy.buttons);
         }
 

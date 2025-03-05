@@ -15,7 +15,7 @@ namespace ros2_api
             json j = f;
             json wrapped = json{
                 {"type", MessageType::CLIENT_FEEDBACK},
-                {"name", "feedback_channel"},
+                {"name_publisher", "feedback_channel"},
                 {"payload", j}};
             return json::to_msgpack(wrapped);
         }
@@ -27,7 +27,7 @@ namespace ros2_api
             json j = js;
             json wrapped = json{
                 {"type", MessageType::JOINT_STATES},
-                {"name", "joint_states"},
+                {"name_publisher", "joint_states"},
                 {"payload", j}};
             return json::to_msgpack(wrapped);
         }
@@ -39,7 +39,7 @@ namespace ros2_api
             int type;
             json_structure.at("type").get_to(type);
             std::string name;
-            json_structure.at("publisher_name").get_to(name);
+            json_structure.at("name_publisher").get_to(name);
             json payload;
             json_structure.at("payload").get_to(payload);
             const void *msg = get_message_content(type, payload);
