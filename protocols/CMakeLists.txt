@@ -13,11 +13,17 @@ find_package(pluginlib REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 
-add_library(protocols src/unix_domain_socket.cpp src/tcp_socket.cpp)
+# Use pkg-config to find ZeroMQ
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ZMQ REQUIRED libzmq)
+
+add_library(protocols src/unix_domain_socket.cpp src/tcp_socket.cpp src/zeromq.cpp)
 
 target_include_directories(protocols PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:include>
+  ${ZMQ_INCLUDE_DIRS}  # Add ZeroMQ headers from pkg-config
+)
 
 ament_target_dependencies(
   protocols
@@ -26,6 +32,9 @@ ament_target_dependencies(
   yaml-cpp
   rclcpp
 )
+
+# Link against ZeroMQ libraries using plain signature
+target_link_libraries(protocols ${ZMQ_LIBRARIES})
 
 pluginlib_export_plugin_description_file(protocol_base plugins.xml)
 
@@ -42,7 +51,7 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-#export headers and binaries for ament
+# export headers and binaries for ament
 ament_export_include_directories(
   include)
 ament_export_libraries(
