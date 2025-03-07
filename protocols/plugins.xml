@@ -5,7 +5,7 @@
   <class type="protocols::TCPSocket" base_class_type="protocol_base::CommunicationProtocol">
     <description>This is a TCP socket plugin.</description>
   </class>
-  <class type="protocols::TCPSocket" base_class_type="protocol_base::CommunicationProtocol">
-    <description>This is a TCP socket plugin.</description>
+  <class type="protocols::ZeroMQ" base_class_type="protocol_base::CommunicationProtocol">
+    <description>This is a ZeroMQ plugin.</description>
   </class>
 </library>
