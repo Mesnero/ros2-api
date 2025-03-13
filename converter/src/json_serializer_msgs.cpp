@@ -40,7 +40,6 @@ namespace ros2_api
             auto joint_names = config::ConfigParser::instance().get_joint_names();
             auto frame_id = config::ConfigParser::instance().get_base_frame();
             trajectory_msgs::msg::JointTrajectory traj_msg;
-            traj_msg.header.stamp = rclcpp::Time(0, 0, RCL_ROS_TIME);
             traj_msg.header.frame_id = frame_id;
             traj_msg.joint_names = joint_names;
             std::vector<json> points;

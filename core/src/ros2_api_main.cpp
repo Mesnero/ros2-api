@@ -95,10 +95,16 @@ int main(int argc, char **argv)
 
   auto publisher_config = ros2_api::config::ConfigParser::instance().get_publisher_config();
   auto message_handler_node = std::make_shared<ros2_api::core::MessageHandler>(protocol);
+  message_handler_node->set_parameter(rclcpp::Parameter("use_sim_time", true)); //TODO: CHANGE BASED ON CONFIG
   message_handler_node.get()->set_up_publishers(publisher_config);
+
   auto feedback_sender_node = std::make_shared<ros2_api::core::FeedbackSender>(protocol);
+  feedback_sender_node->set_parameter(rclcpp::Parameter("use_sim_time", true)); //TODO: CHANGE BASED ON CONFIG
+
   feedback_sender_node.get()->set_up_subscription();
   auto state_sender_node = std::make_shared<ros2_api::core::StateSender>(protocol);
+  state_sender_node->set_parameter(rclcpp::Parameter("use_sim_time", true)); //TODO: CHANGE BASED ON CONFIG
+
   state_sender_node.get()->set_up_subscription();
 
   rclcpp::executors::MultiThreadedExecutor executor;
