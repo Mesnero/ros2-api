@@ -56,15 +56,10 @@ namespace protocols
         void stop() override;
     
     protected:
-        std::string endpoint_;
+        std::string endpoint_recv_;
+        std::string endpoint_send_;
 
     private:
-        /**
-         * @brief Handles communication with the connected client.
-         *
-         * Reads data from the client and invokes the callback function.
-         */
-        void handle_client();
 
         /**
          * @brief Starts the thread for receiving data from the socket.
@@ -76,7 +71,9 @@ namespace protocols
         std::atomic<bool> running_{false};
         std::thread processing_thread_;
         zmq::context_t context_;
-        zmq::socket_t socket_;
+        zmq::socket_t socket_recv_;
+        zmq::socket_t socket_send_;
+
     };
 } // namespace protocols
 #endif // UNIX_DOMAIN_SOCKET_HPP
