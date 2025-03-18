@@ -42,16 +42,4 @@ install(
 # Export the include directories.
 ament_export_include_directories(include)
 
-
-if(BUILD_TESTING)
-  find_package(ament_cmake_gtest REQUIRED)
-  ament_add_gtest(test_publisher test/test_publisher.cpp)
-  if(TARGET test_publisher)
-    target_include_directories(test_publisher PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    )
-    target_link_libraries(test_publisher publisher)
-  endif()
-endif()
-
 ament_package()

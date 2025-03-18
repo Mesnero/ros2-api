@@ -37,13 +37,10 @@ namespace ros2_api
 
         void from_json(const json &j, JointTrajectory &w)
         {
-            auto joint_names = config::ConfigParser::instance().get_joint_names();
-            auto frame_id = config::ConfigParser::instance().get_base_frame();
             trajectory_msgs::msg::JointTrajectory traj_msg;
-            traj_msg.header.frame_id = frame_id;
-            traj_msg.joint_names = joint_names;
             std::vector<json> points;
             j.at("joint_traj_points").get_to(points);
+            j.at("joint_names").get_to(traj_msg.joint_names);
             for (json traj_point : points)
             {
                 trajectory_msgs::msg::JointTrajectoryPoint point;
@@ -89,6 +86,8 @@ namespace ros2_api
 
         void to_json(json &j, const JointStates js)
         {
+            j["nanoseconds"] = js.states.header.stamp.nanosec;
+            j["seconds"] = js.states.header.stamp.sec;
             j["names"] = js.states.name;
             j["position"] = js.states.position;
             j["velocity"] = js.states.velocity;
@@ -97,10 +96,9 @@ namespace ros2_api
 
         void from_json(const json &j, JointStates &js)
         {
-            auto joint_names = config::ConfigParser::instance().get_joint_names();
-            auto frame_id = config::ConfigParser::instance().get_base_frame();
-            js.states.header.frame_id = frame_id;
-            js.states.name = joint_names;
+            j["nanoseconds"].get_to(js.states.header.stamp.nanosec);
+            j["seconds"].get_to(js.states.header.stamp.sec);
+            j.at("joint_names").get_to(js.states.name);
             j.at("position").get_to(js.states.position);
             j.at("effort").get_to(js.states.effort);
             j.at("velocity").get_to(js.states.velocity);

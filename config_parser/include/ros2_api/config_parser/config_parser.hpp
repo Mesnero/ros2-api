@@ -58,20 +58,6 @@ namespace ros2_api
              */
             YAML::Node get_transport_params() const;
 
-            /**
-             * @brief Get the joint names
-             *
-             * @return std::vector<std::string> Vector of joint names
-             * @throws std::runtime_error if no joint names are set
-             */
-            std::vector<std::string> get_joint_names() const;
-
-            /**
-             * @brief Get the base frame
-             *
-             * @return std::string Base frame
-             */
-            std::string get_base_frame() const;
 
             /**
              * @brief Get the publisher configuration
@@ -127,11 +113,9 @@ namespace ros2_api
             YAML::Node root_node_;
             std::string config_path_;
             rclcpp::Logger logger_;
-            std::string base_frame_;
             std::string state_topic_;
             std::string transport_plugin_name_;
             YAML::Node transport_params_;
-            std::vector<std::string> joint_names_;
             std::vector<MessageConfig> publisher_config_;
         };
     } // namespace config

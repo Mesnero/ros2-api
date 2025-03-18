@@ -51,8 +51,6 @@ namespace ros2_api
             transport_plugin_name_ = "";
             transport_params_ = YAML::Node();
             state_topic_ = "";
-            base_frame_ = "";
-            joint_names_.clear();
         }
 
         std::string ConfigParser::get_transport_type() const
@@ -79,22 +77,6 @@ namespace ros2_api
             return transport_params_;
         }
 
-        std::vector<std::string> ConfigParser::get_joint_names() const
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            if (joint_names_.empty())
-            {
-                throw std::runtime_error("No joint names set.");
-            }
-            return joint_names_;
-        }
-
-        std::string ConfigParser::get_base_frame() const
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            return base_frame_;
-        }
-
         bool ConfigParser::validate_config()
         {
             MessageTypeMapper mtm;
@@ -109,28 +91,6 @@ namespace ros2_api
 
             // Get state topic value
             state_topic_ = get_topic_value(params, "states_topic", "joint_states");
-
-            // Load joint_names and base_frame
-            if (params["joint_names"].IsSequence())
-            {
-                for (const auto &iface : params["joint_names"])
-                {
-                    joint_names_.push_back(iface.as<std::string>());
-                }
-            }
-            else
-            {
-                RCLCPP_WARN(logger_, "No joint_names specified! JointTrajectory will not work.");
-            }
-
-            if (params["base_frame"])
-            {
-                base_frame_ = params["base_frame"].as<std::string>();
-            }
-            else
-            {
-                base_frame_ = "map";
-            }
 
             // Setup MessageConfig array for publishers
             if (!params["publishers"] || !params["publishers"].IsSequence())

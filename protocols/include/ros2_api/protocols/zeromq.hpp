@@ -54,6 +54,9 @@ namespace protocols
          * Stops the receiving thread and closes the socket.
          */
         void stop() override;
+    
+    protected:
+        std::string endpoint_;
 
     private:
         /**
@@ -74,7 +77,6 @@ namespace protocols
         std::thread processing_thread_;
         zmq::context_t context_;
         zmq::socket_t socket_;
-        std::string endpoint_;
     };
 } // namespace protocols
 #endif // UNIX_DOMAIN_SOCKET_HPP

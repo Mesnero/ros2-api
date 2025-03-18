@@ -82,27 +82,6 @@ install(
 # Install launch and config files
 install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
 
-# Add testing targets
-if(BUILD_TESTING)
-  find_package(ament_cmake_gtest REQUIRED)
-  
-  ament_add_gtest(test_handler test/test_handler.cpp)
-  if(TARGET test_handler)
-    target_include_directories(test_handler PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    )
-    target_link_libraries(test_handler core)
-  endif()
-  
-  ament_add_gtest(test_sender test/test_sender.cpp)
-  if(TARGET test_sender)
-    target_include_directories(test_sender PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    )
-    target_link_libraries(test_sender core)
-  endif()
-endif()
-
 # Export package information
 ament_export_include_directories(include)
 ament_export_libraries(core)

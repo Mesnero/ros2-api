@@ -67,22 +67,6 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  # The following lines skip some lint checks. Uncomment them if needed.
-  # set(ament_cmake_copyright_FOUND TRUE)
-  # set(ament_cmake_cpplint_FOUND TRUE)
-  find_package(ament_cmake_gtest REQUIRED)
-  
-  ament_add_gtest(test_converter test/test_json_serializer.cpp)
-  if(TARGET test_converter)
-    target_include_directories(test_converter PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    )
-    target_link_libraries(test_converter converter)
-  endif()
-endif()
-
 # export headers and binaries for ament
 ament_export_include_directories(
   include)

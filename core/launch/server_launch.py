@@ -14,13 +14,21 @@ def generate_launch_description():
         description='Path to the configuration file'
     )
     
+    use_sim_arg = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='false',
+        description='Use simulation time'
+    )
+    
     config_file = LaunchConfiguration('config_file')
+    use_sim_time = LaunchConfiguration('use_sim_time')
     
     node_server = Node(
         package='core',
         executable='ros2_api_node',
         output='screen',
-        arguments=['--config_file', config_file]
+        arguments=['--config_file', config_file],
+        parameters=[{'use_sim_time': use_sim_time}]
     )
 
-    return LaunchDescription([config_file_arg, node_server])
+    return LaunchDescription([config_file_arg, use_sim_arg, node_server])
