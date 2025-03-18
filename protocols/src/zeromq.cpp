@@ -93,6 +93,7 @@ void ZeroMQ::send_to_client(const std::uint8_t *message, int length)
   zmq::message_t msg(length);
   memcpy(msg.data(), message, length);
   try {
+    RCLCPP_INFO(rclcpp::get_logger("ZeroMQ"), "Sending message to client");
     socket_send_.send(msg, zmq::send_flags::none);
   } catch (const zmq::error_t &e) {
     RCLCPP_ERROR(rclcpp::get_logger("ZeroMQ"), "Error sending message: %s", e.what());
@@ -110,10 +111,10 @@ void ZeroMQ::start_receiving()
   }
 
   try {
-    socket_send_.connect(endpoint_send_);
-    RCLCPP_INFO(rclcpp::get_logger("ZeroMQ"), "ZeroMQ sending socket connected to %s", endpoint_send_.c_str());
+    socket_send_.bind(endpoint_send_);
+    RCLCPP_INFO(rclcpp::get_logger("ZeroMQ"), "ZeroMQ sending socket bound to %s", endpoint_send_.c_str());
   } catch (const zmq::error_t &e) {
-    RCLCPP_ERROR(rclcpp::get_logger("ZeroMQ"), "Error connecting sending socket: %s", e.what());
+    RCLCPP_ERROR(rclcpp::get_logger("ZeroMQ"), "Error binding sending socket: %s", e.what());
     return;
   }
 
