@@ -11,13 +11,14 @@ Core functionalities for handling state and feedback messages, sending messages,
 4. [protocol_base](https://github.com/Mesnero/ros2-api/tree/main/protocol_base)
 Defines the base [pluginlib](https://github.com/ros/pluginlib/tree/humble) class for communication protocols.
 5. [protocols](https://github.com/Mesnero/ros2-api/tree/main/protocols)
-Implements specific communication protocols such as Unix Domain Sockets and Transmission Control Protocol and exports them as plugins.
+Implements specific communication protocols such as Unix Domain Sockets and Transmission Control Protocol (using ZeroMQ) and exports them as plugins.
 6. [publisher](https://github.com/Mesnero/ros2-api/tree/main/publisher)
 Provides a wrapper and factories for ROS2 publishers, to make them polymorpic.
 7. [ros2_api_msgs](https://github.com/Mesnero/ros2-api/tree/main/ros2_api_msgs)
-Adds custom message type for ClientFeedback
+Adds custom message type for ClientFeedback.
 9. [types](https://github.com/Mesnero/ros2-api/tree/main/types)
 Defines various types and enums used across the project.
+
 ## Building the project
 To build the project, follow these steps:
 1.  Clone the repository.
@@ -39,20 +40,7 @@ The configuration file is structured under a single top-level key: `ros2_api`. U
 - Description: Specifies the ROS topic from which the joint states are read.
 - Default / Example: `"joint_states"`
 - Required: false
-#### `joint_names`:
-- Type: List of Strings
-- Description: A required list of the joint names. It is used to reduce the payload of client and server. In the creation of messages that need joint_names, this list is inserted. If none are present and some controller/publisher needs them, it throws a runtime_error.
-- Example:
-
-       - "panda_joint1" 
-       - "panda_joint2" 
-       - "panda_joint3" 
-- Required: false
-#### `base_frame`:
-- Type: String
-- Description: Defines the base frame for the robot. It is used to reduce the payload of client and server. In the creation of messages that need base_frame, this string is inserted. If none is set and some controller/publisher needs them, it returns the default.
-- Example/Default: `world`
-- Required: false
+- 
 #### `publishers`:
 - Type: List of Publisher Objects
 - Description: At least one publisher is required. Each publisher defines a ROS2 publisher, that publishes messages to the topic.
@@ -72,7 +60,7 @@ The configuration file is structured under a single top-level key: `ros2_api`. U
 		- Required: True
 	- `topic`:
 		- Type: String
-		- Description: The topic name to which the publisher sends its command. If omitted, it defaults to a value specified by the Message.
+		- Description: The topic name to which the publisher sends its command. If omitted, it defaults to a value specified by the Message (found in types).
 		- Required: False
 #### `transport`:
 - Type: Object
@@ -98,7 +86,8 @@ JSON Structure:
     {
 		"type": 20;
 		"publisher_name": string;
-		"payload": 
+		"payload": {
+  			"joint_names": string[];
 			"joint_traj_points": 
 			[
 				{
@@ -110,6 +99,7 @@ JSON Structure:
 					"nanoseconds": int;
 				}
 			];
+   		}
 	}
 #### [JointGroupPositionController](https://control.ros.org/humble/doc/ros2_controllers/position_controllers/doc/userdoc.html)
 Default topic: `<name>/commands`
@@ -119,9 +109,10 @@ JSON Structure:
     {
 		"type": 30;
 		"publisher_name": string;
-		"payload": 
+		"payload": {
 			"joint_values": double[];
-	}
+   		}
+    }
 #### [JointGroupEffortController](https://control.ros.org/humble/doc/ros2_controllers/effort_controllers/doc/userdoc.html)
 Default topic: `<name>/commands`
 
@@ -130,9 +121,10 @@ JSON Structure:
     {
 		"type": 31;
 		"publisher_name": string;
-		"payload": 
+		"payload": {
 			"joint_values": double[];
-	}
+   		}
+    }
 #### [JointGroupVelocityController](https://control.ros.org/humble/doc/ros2_controllers/velocity_controllers/doc/userdoc.html)
 Default topic: `<name>/commands`
 
@@ -141,64 +133,71 @@ JSON Structure:
     {
 		"type": 32;
 		"publisher_name": string;
-		"payload": 
+		"payload": {
 			"joint_values": double[];
-	}
+   		}
+    }
 #### [JoyMessage](https://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Joy.html)
-Default topic: `controller_input`
+Default topic: `/controller_input`
 JSON Structure:
 
     {
 		"type": 50;
 		"publisher_name": string;
-		"payload": 
+		"payload": {
 			"buttons": int[];
    			"axes": double[];
-	}
+      		}
+    }
 #### JointStates
-Default topic: `joints_states`
+Default topic: `/joints_states`
 
 JSON Structure:
 
     {
 		"type": 2;
 		"publisher_name": string;
-		"payload": 
+		"payload": {
 				"names": string[];
 				"positions": double[];
 				"velocity": double[];
 				"effort": double[];
+    				"nanoseconds": int;
+				"seconds": int;
+    		}
 	}
 #### ClientFeedback
-Default topic: `feedback_channel`
+Default topic: `/feedback_channel`
 
 JSON Structure:
 
     {
 		"type": 1;
 		"publisher_name": string;
-		"payload": 
+		"payload": {
 			"feedback_code": int;
 			"message": string;
-	}
+   		}
+    }
 
 Most feedback code only make sense when used with the Validator found [here](https://github.com/Mesnero/rosbco).
 The Feedback Code currently has the following mapping:
 
-    PUBLISHER_NOT_FOUND (1): Returned when the publisher_name was not found.
+    	PUBLISHER_NOT_FOUND (1): Returned when the publisher_name was not found.
 	UNEXPECTED_MSG_STRUCTURE (2):  Returned when the JSON Structure was formatted unexpectedly.
 	ROBOT_DISCONNECTED_UNEXPECTEDLY (3): Returned when the robot suddenly disconnected.
 	INVALID_CMD (100): Returned if the validator can't use the command.
-	NO_WARNING (101): Returned if everything worked as expected.
-	DECELERATE_FOR_APPROACHING_SINGULARITY (102): Returned if the Validator needs to break, because of an approaching singularity.
- 	HALT_FOR_SINGULARITY (103): Returned if the Validator needs to halt, because of a singularity.
+	VELOCITY_LIMIT (101): Returned if a joint exceeded the velocity limit.
+	DECELERATE_FOR_APPROACHING_SINGULARITY (102): Returned if the Validator needs to break, because of an approaching singularity (Only sent when using cartesian mode in Validator).
+ 	HALT_FOR_SINGULARITY (103): Returned if the Validator needs to halt, because of a singularity (Only sent when using cartesian mode in Validator).
   	DECELERATE_FOR_COLLISION (104): Returned if the Validator needs to break, because of an upcomming collision.
    	HALT_FOR_COLLISION (105): Returned if the Validator needs to halt, because of a collision.
-	JOINT_BOUND (106): Returned if the Validator is close to a Joint/Velocity limit and needs to break/halt.
-	DECELERATE_FOR_LEAVING_SINGULARITY: Sent when robot is currently leaving the singularity.
+	POSITION_LIMIT (106): Returned if the Validator is close to a Joint Position limit and needs to break/halt.
+	DECELERATE_FOR_LEAVING_SINGULARITY: Sent when robot is currently leaving the singularity (Only sent when using cartesian mode in Validator).
+ 
 ## Adding a new message type
 Right now it is difficult to add new message types. I will work on it, to make it easier. Currently it is only possible to extend the publishers, not the subscribers.
-1. In types.hpp: extend the MessageType enum with your new message and assign it your type number
+1. In types.hpp: extend the MessageType enum with your new message and assign it your type number.
 2. In types.hpp: add your new enum to the mapping array, along with it's String representation and default topic.
 3. In publisher_factory.hpp: Add your new enum to the switch case in create_publisher and return a new publisher with the msg it should have
 4. In json_serializer_msgs.hpp: If your msg isn't yet present: Add a wrapper struct around your message. (Similar to the others) And define the to_json and from_json methods.
@@ -206,33 +205,38 @@ Right now it is difficult to add new message types. I will work on it, to make i
 6. In json_serializer.cpp: Add your MessageType to the get_message_content method
 
 ## Protocols
+In general, there are 3 types of Protocols supported: TCP, Unix Domain Sockets and ZeroMQ.
+Both TCP and Unix Domain Sockets use ZeroMQ under the hood. One Push and one Pull socket are created (one for sending and one for receiving).
 ### protocols::TCPSocket
 Implementation of the Transmission Control Protocol to communicate with the SDK.
 #### Parameters:
 - `ip_address`: String
 	- Default: "127.0.0.1"
 	- Description: The IP-Address the TCP connection should be established on
-- `port`: int
-	- Default: 8080
-	- Description: The port the TCP connection should be established on
-- `queue_size`: int
-	- Default: 1
-	- Description: The queue size for connections
-- `max_message_size`: int
-	- Default: 1024
-	- Description: The maximum amount of data to be sent in one message in bytes
+- `port_send`: int
+	- Default: 5556
+	- Description: The port the TCP Push Socket should be established on
+- `port_recv`: int
+  	- Default: 5555
+  	- Description: The port the TCP Pull Socket should be established on
 ### protocols::UnixDomainSocket
 Implementation of Unix Domain Sockets to communicate with the SDK.
 #### Parameters:
-- `socket_path`: String
-	- Default: "/tmp/ros2_api.socket"
-	- Description: The path to the socket file
-- `queue_size`: int
-	- Default: 1
-	- Description: The queue size for connections
-- `max_message_size`: int
-	- Default: 1024
-	- Description: The maximum amount of data to be sent in one message in bytes
+- `socket_path_recv`: String
+	- Default: "/tmp/ros2_api_recv.socket"
+	- Description: The path to the socket file, that is used for the PULL Socket
+- `socket_path_send`: String
+	- Default: "/tmp/ros2_api_send.socket"
+ 	- Description: The path to the socket file, that is used for the PUSH Socket 	 	 
+### protocols::ZeroMQ
+Implementation of ZeroMQ to communicate with the SDK.
+#### Parameters:
+- `endpoint_recv`: String
+	- Default: "tcp://127.0.0.1:5555"
+ 	- Description: The ZeroMQ endpoint used to create the PULL Socket.
+- `endpoint_send`: String
+	- Default: "tcp://127.0.0.1:5556"
+ 	- Description: The ZeroMQ endpoint used to create the PUSH Socket. 	  	
 ### Adding a new protocol
 1. Extend protocol_base::CommunicationProtocol
 2. Implement: 
@@ -251,8 +255,12 @@ Implementation of Unix Domain Sockets to communicate with the SDK.
 4. Add a plugins.xml file as described [here](https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Pluginlib.html#plugin-declaration-xml)
 5. Edit your CMakeLists.txt as described [here](https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Pluginlib.html#cmake-plugin-declaration)
 6. Now you can use your plugin by adding YOUR_CLASS_NAME and the defined parameters under transport.type and transport.params in the config.yaml file.
+
+IMPORTANT: Threading is the plugins job! You have to make sure no deadlocks or race conditions can happen!
+
 ## Launch
-To launch the API, you have to pass the path to your YAML file as a string. 
+To launch the API, you have to pass the path to your YAML file as a string.
+Additionally, you have to set `use_sim_time` to true or false, based on if you are using Gazebo or not.
 Example:
 
     from  launch  import  LaunchDescription
@@ -264,10 +272,13 @@ Example:
 	def  generate_launch_description():
 		# EXCHANGE WITH YOUR PATH THE CONFIG FILE
 		config_file  =  PathJoinSubstitution([FindPackageShare('core') , 'config', 'api_config.yaml'])
+  		# EXCHANGE WITH YOUR USE CASE
+  		use_sim_time = 'false'
 		node_server  =  Node(
 			package='core',
 			executable='ros2_api_node',
 			output='screen',
-			arguments=['--config_file', config_file]
+			arguments=['--config_file', config_file],
+   			parameters=[{'use_sim_time': use_sim_time}]
 		)
 		return  LaunchDescription([node_server])
